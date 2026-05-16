@@ -1,0 +1,500 @@
+Create an ultra-modern, highly secure, production-ready full-stack premium anime streaming platform named **“SHIVAM ANIMES WEB FOR PREMIUM USERS”** using:
+
+* Next.js 15 (App Router)
+* Tailwind CSS
+* TypeScript
+* MongoDB Atlas
+* JWT Authentication
+* Node.js API Routes
+* Vercel Deployment
+* Framer Motion animations
+* Secure backend architecture
+
+The project MUST be fully optimized and deploy-ready for **Vercel** with production-grade security, modern UI, scalable architecture, and protected premium access systems.
+
+==================================================
+🌐 WEBSITE OVERVIEW
+===================
+
+Website Name:
+SHIVAM ANIMES WEB FOR PREMIUM USERS
+
+Purpose:
+A secure premium anime episode portal where:
+
+* Owner controls premium access
+* Users can only login on one device
+* Anime episode links remain hidden/protected
+* Non-premium users cannot access protected episodes
+* Non-Indian users can unlock content through monetized short links
+* Premium users get full anime access
+* Entire platform is secured against bypass attempts
+
+Theme Style:
+
+* Futuristic anime aesthetic
+* Dark mode UI
+* Black + purple neon colors
+* Glassmorphism cards
+* Smooth transitions
+* Animated backgrounds
+* Premium luxury feel
+* Responsive for mobile + desktop
+
+==================================================
+🖼 BRANDING & LOGO
+==================
+
+Website Logo:
+https://4kwallpapers.com/images/walls/thumbs_2t/22996.jpg
+
+Use logo in:
+
+* Navbar
+* Login page
+* Splash screen
+* Favicon
+* Admin dashboard
+* Loader animation
+
+Add:
+
+* Animated intro splash screen
+* Anime particle effects
+* Dynamic hover glow effects
+* Premium styled typography
+
+==================================================
+🚀 DEPLOYMENT REQUIREMENTS (IMPORTANT)
+======================================
+
+The project MUST be fully deploy-ready for:
+
+* Vercel
+* MongoDB Atlas
+
+Generate:
+
+* vercel.json
+* .env.example
+* README.md
+* Proper folder structure
+* Production build optimization
+* Edge Middleware support
+* API route optimization
+
+README.md must include:
+
+1. Installation guide
+2. MongoDB Atlas setup
+3. JWT secret setup
+4. Environment variables
+5. Vercel deployment steps
+6. Custom domain setup
+7. Security recommendations
+
+Environment variables example:
+
+* MONGODB_URI=
+* JWT_SECRET=
+* NEXTAUTH_SECRET=
+* ADMIN_USERNAME=
+* ADMIN_PASSWORD=
+
+==================================================
+🔐 OWNER / ADMIN SYSTEM
+=======================
+
+Create a powerful Owner/Admin dashboard.
+
+Default Owner Login:
+Username: FirstPremium
+Password: SHIVAMKIT
+
+Admin Features:
+
+* Secure login
+* Dashboard analytics
+* Total users count
+* Active premium users
+* Recently logged users
+* Anime upload manager
+* Premium management system
+* Device lock manager
+* Session control
+* IP logs
+* Solve link manager
+* Revenue stats
+* Premium expiration tracker
+
+Admin Security:
+
+* Hashed passwords using bcrypt
+* Secure JWT cookies
+* Rate limiting
+* Admin route protection
+* CSRF protection
+* Secure headers
+* Session expiration
+* IP tracking
+
+==================================================
+👑 PREMIUM USER MANAGEMENT SYSTEM
+=================================
+
+Owner can:
+
+* Create random premium accounts
+* Create custom username/password accounts
+* Set premium durations:
+
+  * 15 Days
+  * 1 Month
+  * Custom duration
+* Suspend users
+* Delete users
+* Extend premium
+* Reset device lock
+* Monitor active sessions
+* View login device information
+
+Store all data securely in MongoDB Atlas.
+
+==================================================
+📱 ONE DEVICE LOGIN LOCK SYSTEM
+===============================
+
+IMPORTANT SECURITY FEATURE:
+
+Premium users can login on ONLY ONE DEVICE.
+
+Implement:
+
+* Browser fingerprinting
+* Device ID storage
+* Session validation middleware
+* Device token verification
+* Login lock system
+
+If another device attempts login:
+
+* Reject access
+* Show:
+  “Account already active on another device.”
+
+Admin can:
+
+* Reset device lock manually
+* Force logout sessions
+
+==================================================
+🎥 ADVANCED ANIME MANAGEMENT SYSTEM
+===================================
+
+Create a complete Anime CMS inside Admin Dashboard.
+
+Owner can:
+
+* Add anime title
+* Add anime description
+* Add genres
+* Add tags
+* Add release year
+* Add anime banner
+* Add cover image
+* Add status:
+
+  * Ongoing
+  * Completed
+* Add anime trailer
+* Add episode list dynamically
+
+Episode Features:
+
+* “Add Episode” button
+* Episode number
+* Episode title
+* Protected streaming link
+* Episode thumbnail
+* Edit/Delete episodes
+* Rearrange episode order
+* Recently added anime section
+
+==================================================
+🔒 ADVANCED LINK PROTECTION SYSTEM
+==================================
+
+VERY IMPORTANT:
+
+Anime links must NEVER be directly visible.
+
+Implement advanced anti-bypass protection:
+
+* Backend proxy streaming
+* Temporary encrypted tokens
+* Hidden real URLs
+* Expiring stream sessions
+* Anti-download protection
+* Anti-inspect methods
+* Disable direct media access
+* Obfuscated API routes
+
+Disable:
+
+* Right click
+* Text selection
+* Copy
+* Paste
+* Dragging
+* CTRL+C
+* CTRL+U
+* CTRL+S
+* F12
+* Inspect shortcuts
+
+Also:
+
+* Disable screenshot helper overlays
+* Blur content when devtools detected
+* Session invalidate on suspicious behavior
+
+==================================================
+🌍 SOLVE LINK PAGE (NON-INDIAN USERS ONLY)
+==========================================
+
+Create:
+/solve-link
+
+Purpose:
+Non-Indian users can unlock access using monetized short links.
+
+Rules:
+
+* Detect user country using IP geolocation
+* ONLY non-Indian users can access
+* Indian users must see:
+  “Solve Link is not available in your region.”
+
+Owner can add:
+
+* Post title
+* Post image
+* Description
+* Shortener URL
+* External redirect links
+
+When user clicks:
+
+* Redirect to owner-added shortener
+
+Also display:
+
+* Recently added solve posts
+* Trending unlock posts
+
+==================================================
+💳 PREMIUM PAYMENT SYSTEM
+=========================
+
+Add a “Buy Premium” button above login page.
+
+When clicked:
+Open a premium payment page/popup.
+
+Premium Plans:
+
+* 15 Days Premium = ₹10
+* 1 Month Premium = ₹19
+
+QR Image:
+https://ibb.co/KjwxK7Zx
+
+Features:
+
+* Premium plan cards
+* QR payment image
+* Payment instructions
+* Premium benefits section
+* Animated glowing UI
+* Responsive mobile design
+
+==================================================
+📲 TELEGRAM CONTACT BUTTON
+==========================
+
+Under QR payment image add:
+
+Button Text:
+“Contact on Telegram for Premium”
+
+Telegram Deep Link:
+tg://user?id=8002803133
+
+Fallback URL:
+https://t.me/+8002803133
+
+Features:
+
+* Telegram icon
+* Neon glow effect
+* Smooth hover animation
+* One-click Telegram redirect
+* Mobile + Desktop compatible
+
+==================================================
+📺 USER FEATURES
+================
+
+Premium users can:
+
+* Browse anime
+* Watch protected episodes
+* Continue watching
+* Save favorites
+* Search anime instantly
+* View recently added episodes
+* Access premium-only content
+
+Non-premium users:
+
+* Cannot watch episodes
+* Redirected to Buy Premium page
+
+==================================================
+🔎 ADVANCED SEARCH & FILTERS
+============================
+
+Add:
+
+* Instant search
+* Genre filters
+* Anime tags
+* Recently updated
+* Trending anime
+* Pagination
+* Lazy loading
+* Infinite scrolling
+
+==================================================
+📊 ANALYTICS SYSTEM
+===================
+
+Admin analytics dashboard:
+
+* Daily visits
+* Active sessions
+* Premium sales
+* Country traffic
+* Anime views
+* Most watched anime
+* Device analytics
+
+==================================================
+🛡 ADVANCED SECURITY SYSTEM
+===========================
+
+Implement:
+
+* MongoDB injection protection
+* XSS protection
+* CSRF protection
+* Helmet security headers
+* API request validation
+* Session verification middleware
+* JWT authentication
+* Token expiration
+* Secure HTTP-only cookies
+* Rate limiting
+* Hidden API architecture
+* Anti hotlink protection
+* Anti bypass structure
+* Protected streaming middleware
+
+==================================================
+📂 DATABASE COLLECTIONS
+=======================
+
+MongoDB collections:
+
+* users
+* anime
+* episodes
+* premiumPlans
+* payments
+* sessions
+* analytics
+* solveLinks
+* admins
+* activityLogs
+
+==================================================
+⚡ PERFORMANCE OPTIMIZATION
+==========================
+
+Optimize for:
+
+* Fast loading
+* SEO
+* Mobile devices
+* Vercel Edge Functions
+* Lazy image loading
+* Optimized API routes
+* CDN compatibility
+* Dynamic metadata
+* Server-side rendering where needed
+
+==================================================
+🎨 UI/UX FEATURES
+=================
+
+Add:
+
+* Animated navbar
+* Glassmorphism cards
+* Loading skeletons
+* Toast notifications
+* Anime banner slider
+* Responsive sidebar
+* Hover glow effects
+* Smooth route transitions
+* Premium styled buttons
+* Dynamic gradient backgrounds
+
+==================================================
+📁 REQUIRED GENERATED FILES
+===========================
+
+Generate full production-ready project including:
+
+* Frontend
+* Backend
+* MongoDB models
+* API routes
+* Middleware
+* Authentication system
+* Admin dashboard
+* Anime CMS
+* Protected stream system
+* Solve link page
+* Premium payment page
+* Telegram integration
+* Tailwind config
+* Vercel deployment config
+* README.md
+* .env.example
+
+==================================================
+🎯 FINAL OBJECTIVE
+==================
+
+Build a highly advanced premium anime web platform that:
+
+* Works perfectly on Vercel
+* Uses MongoDB Atlas securely
+* Protects streaming links
+* Prevents account sharing
+* Restricts solve links for Indian users
+* Allows premium-only anime access
+* Looks futuristic and premium
+* Includes complete admin control
+* Is optimized, scalable, and production-ready.
