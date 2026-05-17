@@ -107,13 +107,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Admin hint */}
-          <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/20 text-center">
-            <p className="text-xs text-muted-foreground">
-              Admin credentials: <span className="text-primary font-mono">FirstPremium</span> / <span className="text-primary font-mono">SHIVAMKIT</span>
-            </p>
-          </div>
-
           <p className="text-center mt-4 text-xs text-muted-foreground">
             <Link href="/" className="hover:text-primary transition-colors">Back to Home</Link>
           </p>
