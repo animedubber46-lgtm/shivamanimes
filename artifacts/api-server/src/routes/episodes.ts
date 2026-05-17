@@ -15,6 +15,7 @@ function formatEpisode(e: typeof episodesTable.$inferSelect) {
     animeId: e.animeId,
     number: e.number,
     title: e.title,
+    streamUrl: e.streamUrl ?? null,
     thumbnail: e.thumbnail ?? null,
     createdAt: e.createdAt.toISOString(),
   };

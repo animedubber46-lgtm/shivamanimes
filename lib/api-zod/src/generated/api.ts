@@ -180,6 +180,7 @@ export const GetAnimeResponse = zod.object({
   "animeId": zod.number(),
   "number": zod.number(),
   "title": zod.string(),
+  "streamUrl": zod.string().nullish(),
   "thumbnail": zod.string().nullish(),
   "createdAt": zod.string()
 }))
@@ -243,6 +244,7 @@ export const ListEpisodesResponseItem = zod.object({
   "animeId": zod.number(),
   "number": zod.number(),
   "title": zod.string(),
+  "streamUrl": zod.string().nullish(),
   "thumbnail": zod.string().nullish(),
   "createdAt": zod.string()
 })
@@ -284,6 +286,7 @@ export const UpdateEpisodeResponse = zod.object({
   "animeId": zod.number(),
   "number": zod.number(),
   "title": zod.string(),
+  "streamUrl": zod.string().nullish(),
   "thumbnail": zod.string().nullish(),
   "createdAt": zod.string()
 })

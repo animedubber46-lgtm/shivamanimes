@@ -1,5 +1,5 @@
 import { useParams, Link } from "wouter";
-import { useGetAnime, useAddToWatchlist, useRemoveFromWatchlist, getGetWatchlistQueryKey } from "@workspace/api-client-react";
+import { useGetAnime, useAddToWatchlist, useRemoveFromWatchlist, getGetWatchlistQueryKey, type Episode } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
@@ -105,12 +105,15 @@ export default function AnimeDetailPage() {
             <p className="text-sm text-muted-foreground mb-4 max-w-2xl leading-relaxed">{anime.description}</p>
 
             <div className="flex gap-3 flex-wrap">
-              {anime.episodes && anime.episodes.length > 0 && (
-                <Link href={`/watch/${anime.episodes[0].id}`}
+              {anime.episodes && anime.episodes.length > 0 && anime.episodes[0].streamUrl && (
+                <a
+                  href={anime.episodes[0].streamUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/30"
                 >
                   Watch Ep 1
-                </Link>
+                </a>
               )}
               <button
                 onClick={toggleWatchlist}
@@ -131,28 +134,46 @@ export default function AnimeDetailPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {anime.episodes.map((ep, i) => (
                 <motion.div key={ep.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
-                  <Link href={`/watch/${ep.id}`}>
-                    <div className="flex gap-3 p-3 rounded-xl bg-card border border-border/40 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer group">
-                      <div className="w-24 aspect-video rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                        {ep.thumbnail ? (
-                          <img src={ep.thumbnail} alt={ep.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-primary/30">
-                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-primary font-semibold mb-0.5">Episode {ep.number}</p>
-                        <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2">{ep.title}</p>
-                      </div>
+                  {ep.streamUrl ? (
+                    <a href={ep.streamUrl} target="_blank" rel="noopener noreferrer">
+                      <EpisodeCard ep={ep} />
+                    </a>
+                  ) : (
+                    <div className="opacity-50 cursor-not-allowed">
+                      <EpisodeCard ep={ep} noLink />
                     </div>
-                  </Link>
+                  )}
                 </motion.div>
               ))}
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function EpisodeCard({ ep, noLink }: { ep: Episode; noLink?: boolean }) {
+  return (
+    <div className={`flex gap-3 p-3 rounded-xl bg-card border border-border/40 hover:border-primary/50 hover:bg-primary/5 transition-all group ${noLink ? "" : "cursor-pointer"}`}>
+      <div className="w-24 aspect-video rounded-lg overflow-hidden bg-muted flex-shrink-0 relative">
+        {ep.thumbnail ? (
+          <img src={ep.thumbnail} alt={ep.title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-primary/30">
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+          </div>
+        )}
+        {ep.streamUrl && !noLink && (
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+          </div>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-primary font-semibold mb-0.5">Episode {ep.number}</p>
+        <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2">{ep.title}</p>
+        {noLink && <p className="text-xs text-muted-foreground/50 mt-1">Link coming soon</p>}
       </div>
     </div>
   );

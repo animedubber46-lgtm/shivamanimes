@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useListUsers, useUpdateUser, useCreateAnime, useGetAnalyticsSummary, useGetTopAnime, useListAnime, useDeleteAnime } from "@workspace/api-client-react";
+import { useListUsers, useUpdateUser, useCreateAnime, useCreateEpisode, useGetAnalyticsSummary, useGetTopAnime, useListAnime, useDeleteAnime } from "@workspace/api-client-react";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 
-type Tab = "users" | "anime" | "analytics" | "add-anime";
+type Tab = "users" | "anime" | "analytics" | "add-anime" | "add-episode";
 
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>("users");
@@ -28,13 +28,13 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <div className="flex gap-1 mb-6 p-1 bg-card border border-border/50 rounded-xl w-fit flex-wrap">
-          {(["users", "anime", "add-anime", "analytics"] as Tab[]).map(t => (
+          {(["users", "anime", "add-anime", "add-episode", "analytics"] as Tab[]).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
               className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize ${tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
-              {t.replace("-", " ")}
+              {t.replace(/-/g, " ")}
             </button>
           ))}
         </div>
@@ -42,6 +42,7 @@ export default function AdminPage() {
         {tab === "users" && <UsersTab />}
         {tab === "anime" && <AnimeTab />}
         {tab === "add-anime" && <AddAnimeTab />}
+        {tab === "add-episode" && <AddEpisodeTab />}
         {tab === "analytics" && <AnalyticsTab />}
       </div>
     </div>
@@ -49,7 +50,8 @@ export default function AdminPage() {
 }
 
 function UsersTab() {
-  const { data: users = [], isLoading, refetch } = useListUsers();
+  const { data, isLoading, refetch } = useListUsers();
+  const users = data?.users ?? [];
   const updateMutation = useUpdateUser();
   const { toast } = useToast();
 
@@ -289,6 +291,131 @@ function AddAnimeTab() {
             className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-all disabled:opacity-50 mt-2"
           >
             {createMutation.isPending ? "Adding..." : "Add Anime"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function AddEpisodeTab() {
+  const createMutation = useCreateEpisode();
+  const { data: animeData } = useListAnime({ page: 1, limit: 100 });
+  const { toast } = useToast();
+  const animeList = animeData?.anime ?? [];
+
+  const [form, setForm] = useState({
+    animeId: "",
+    number: "",
+    title: "",
+    streamUrl: "",
+    thumbnail: "",
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.animeId || !form.number || !form.title || !form.streamUrl) {
+      toast({ title: "Anime, episode number, title, and link are required", variant: "destructive" });
+      return;
+    }
+    try {
+      await createMutation.mutateAsync({
+        animeId: parseInt(form.animeId),
+        data: {
+          number: parseInt(form.number),
+          title: form.title,
+          streamUrl: form.streamUrl,
+          thumbnail: form.thumbnail || undefined,
+        },
+      });
+      toast({ title: "Episode added!" });
+      setForm({ animeId: form.animeId, number: "", title: "", streamUrl: "", thumbnail: "" });
+    } catch {
+      toast({ title: "Error adding episode", variant: "destructive" });
+    }
+  };
+
+  return (
+    <div className="max-w-2xl">
+      <div className="bg-card border border-border/50 rounded-2xl p-6">
+        <h2 className="text-lg font-bold text-foreground mb-1">Add Episode with Link</h2>
+        <p className="text-xs text-muted-foreground mb-6">
+          Add an episode and paste the video/stream link. Users will be redirected directly to this link when they click the episode.
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Anime</label>
+            <select
+              value={form.animeId}
+              onChange={e => setForm(f => ({ ...f, animeId: e.target.value }))}
+              required
+              className="w-full bg-background/60 border border-border text-foreground rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-primary"
+            >
+              <option value="">Select anime...</option>
+              {animeList.map(a => (
+                <option key={a.id} value={a.id}>{a.title}</option>
+              ))}
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Episode Number</label>
+              <input
+                type="number"
+                value={form.number}
+                onChange={e => setForm(f => ({ ...f, number: e.target.value }))}
+                placeholder="e.g. 1"
+                required
+                className="w-full bg-background/60 border border-border text-foreground rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-primary"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Title</label>
+              <input
+                type="text"
+                value={form.title}
+                onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                placeholder="Episode title"
+                required
+                className="w-full bg-background/60 border border-border text-foreground rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-primary"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">
+              Stream / Video Link
+              <span className="ml-2 text-primary/60 normal-case tracking-normal">(users click → redirected here)</span>
+            </label>
+            <input
+              type="url"
+              value={form.streamUrl}
+              onChange={e => setForm(f => ({ ...f, streamUrl: e.target.value }))}
+              placeholder="https://your-stream-link.com/episode"
+              required
+              className="w-full bg-background/60 border border-border text-foreground rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-primary font-mono"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Thumbnail URL (optional)</label>
+            <input
+              type="url"
+              value={form.thumbnail}
+              onChange={e => setForm(f => ({ ...f, thumbnail: e.target.value }))}
+              placeholder="https://image-url.com/thumb.jpg"
+              className="w-full bg-background/60 border border-border text-foreground rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-primary"
+            />
+          </div>
+          <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+            <p className="text-xs text-muted-foreground">
+              <span className="text-primary font-semibold">Tip:</span> You can paste any URL — a Telegram file link, Google Drive link, direct MP4, or a third-party player link. Premium users will be redirected to it when they click the episode.
+            </p>
+          </div>
+          <button
+            type="submit"
+            disabled={createMutation.isPending}
+            className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-all disabled:opacity-50 mt-2"
+          >
+            {createMutation.isPending ? "Adding..." : "Add Episode"}
           </button>
         </form>
       </div>

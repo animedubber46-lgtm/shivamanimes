@@ -892,6 +892,8 @@ components:
           type: integer
         title:
           type: string
+        streamUrl:
+          type: ["string", "null"]
         thumbnail:
           type: ["string", "null"]
         createdAt:

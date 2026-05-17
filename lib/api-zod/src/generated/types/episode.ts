@@ -12,6 +12,8 @@ export interface Episode {
   number: number;
   title: string;
   /** @nullable */
+  streamUrl?: string | null;
+  /** @nullable */
   thumbnail?: string | null;
   createdAt: string;
 }

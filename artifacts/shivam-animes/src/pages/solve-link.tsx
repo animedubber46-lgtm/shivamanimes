@@ -1,9 +1,65 @@
 import { useListSolveLinks } from "@workspace/api-client-react";
+import { useAuth } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
+import { useMemo } from "react";
+
+function detectIndianUser(): boolean {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz === "Asia/Calcutta" || tz === "Asia/Kolkata") return true;
+    const offset = -new Date().getTimezoneOffset();
+    if (offset === 330) return true;
+  } catch {
+    // ignore
+  }
+  return false;
+}
 
 export default function SolveLinkPage() {
+  const { user } = useAuth();
+  const isIndian = useMemo(() => detectIndianUser(), []);
   const { data: links = [], isLoading } = useListSolveLinks();
+
+  if (isIndian && user?.role !== "admin") {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="pt-24 max-w-4xl mx-auto px-4 pb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-20"
+          >
+            <div className="w-20 h-20 rounded-full bg-destructive/10 border border-destructive/30 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-destructive/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-black text-foreground mb-3">Not Available in Your Region</h1>
+            <p className="text-muted-foreground max-w-md mx-auto mb-8">
+              The Solve Link feature is not available for users in India. Please use the Buy Premium option to get access.
+            </p>
+            <div className="flex gap-3 justify-center flex-wrap">
+              <a
+                href="/buy-premium"
+                className="px-6 py-2.5 rounded-lg bg-yellow-500 text-black font-bold text-sm hover:bg-yellow-400 transition-all shadow-lg shadow-yellow-500/20"
+              >
+                Buy Premium — Starting ₹10
+              </a>
+              <a
+                href="/"
+                className="px-6 py-2.5 rounded-lg border border-border text-foreground font-semibold text-sm hover:border-primary/50 transition-all"
+              >
+                Go Home
+              </a>
+            </div>
+            <p className="text-xs text-muted-foreground/50 mt-6">Detection based on device timezone: Asia/Kolkata (IST)</p>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -15,29 +71,8 @@ export default function SolveLinkPage() {
           </div>
           <h1 className="text-2xl md:text-3xl font-black text-foreground mb-2">Solve Link</h1>
           <p className="text-sm text-muted-foreground max-w-xl">
-            Complete tasks via shortener links to unlock free premium access. This feature is available for users outside India only.
+            Complete tasks via shortener links to unlock free premium access. Available for users outside India only.
           </p>
-        </motion.div>
-
-        {/* Region notice */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-yellow-500/5 border border-yellow-500/20 rounded-xl p-4 mb-8"
-        >
-          <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <div>
-              <p className="text-sm font-semibold text-yellow-400">Regional Restriction</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Indian users: Solve Link is not available in your region. Please use the Buy Premium option instead.
-                Non-Indian users may proceed with the links below.
-              </p>
-            </div>
-          </div>
         </motion.div>
 
         {/* Trending first */}
@@ -55,7 +90,6 @@ export default function SolveLinkPage() {
           </section>
         )}
 
-        {/* All links */}
         <section>
           <h2 className="text-base font-bold text-foreground mb-4 flex items-center gap-2">
             <span className="w-1.5 h-5 rounded-full bg-accent" />
@@ -82,7 +116,17 @@ export default function SolveLinkPage() {
   );
 }
 
-function SolveLinkCard({ link, i }: { link: { id: number; title: string; description?: string | null; image?: string | null; shortenerUrl: string; isTrending: boolean; createdAt: string }; i: number }) {
+type SolveLink = {
+  id: number;
+  title: string;
+  description?: string | null;
+  image?: string | null;
+  shortenerUrl: string;
+  isTrending: boolean;
+  createdAt: string;
+};
+
+function SolveLinkCard({ link, i }: { link: SolveLink; i: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
