@@ -17,12 +17,8 @@ const BENEFITS = [
 ];
 
 export default function BuyPremiumPage() {
-  const telegramUrl = "tg://user?id=8002803133";
-  const telegramFallback = "https://t.me/+8002803133";
-
   const handleTelegram = () => {
-    window.location.href = telegramUrl;
-    setTimeout(() => { window.open(telegramFallback, "_blank"); }, 1500);
+    window.open("https://t.me/A_Gatherers_isekai_In_Hindi", "_blank");
   };
 
   return (

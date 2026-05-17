@@ -50,21 +50,20 @@ const generateFingerprint = async () => {
   return `dev_${Math.abs(hash).toString(16)}`;
 };
 
-// Monkey patch customFetch to include token
+// Monkey patch window.fetch to inject the JWT auth token on every request.
+// IMPORTANT: init.headers may be a Headers object (from customFetch) — spreading
+// it with {...} yields {} because Headers is not a plain object. We must use
+// Object.fromEntries(new Headers(...).entries()) to correctly preserve all headers.
 const originalFetch = window.fetch;
 window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   const token = localStorage.getItem("anime_token");
-  
-  const modifiedInit = { ...init };
-  if (token) {
-    modifiedInit.headers = {
-      ...modifiedInit.headers,
-      "Authorization": `Bearer ${token}`
-    };
-  }
-  
-  // Apply the same logic to customFetch internally if needed, but since it uses fetch, 
-  // patching window.fetch might be enough.
+  const existingHeaders = Object.fromEntries(new Headers(init?.headers).entries());
+  const modifiedInit: RequestInit = {
+    ...init,
+    headers: token
+      ? { ...existingHeaders, "Authorization": `Bearer ${token}` }
+      : existingHeaders,
+  };
   return originalFetch(input, modifiedInit);
 };
 
