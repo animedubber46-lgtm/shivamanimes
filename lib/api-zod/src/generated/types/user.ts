@@ -21,5 +21,7 @@ export interface User {
   lastLogin?: string | null;
   /** @nullable */
   lastLoginIp?: string | null;
+  /** @nullable */
+  storedPassword?: string | null;
   createdAt?: string;
 }

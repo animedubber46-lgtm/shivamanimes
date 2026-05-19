@@ -14,7 +14,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = async () => {
-    await logoutMutation.mutateAsync({});
+    await logoutMutation.mutateAsync(undefined as unknown as void);
     setToken(null);
     queryClient.clear();
     navigate("/login");

@@ -47,7 +47,7 @@ export default function HomePage() {
                 transition={{ duration: 0.5 }}
               >
                 <div className="flex gap-2 mb-3">
-                  {banner.genres.slice(0, 3).map(g => (
+                  {(banner.genres ?? []).slice(0, 3).map(g => (
                     <span key={g} className="text-xs px-2 py-0.5 rounded bg-primary/20 border border-primary/30 text-primary">{g}</span>
                   ))}
                 </div>

@@ -83,8 +83,8 @@ export default function SolveLinkPage() {
               Trending
             </h2>
             <div className="grid sm:grid-cols-2 gap-4">
-              {links.filter(l => l.isTrending).map((link, i) => (
-                <SolveLinkCard key={link.id} link={link} i={i} />
+              {links.filter(l => !!l.isTrending).map((link, i) => (
+                <SolveLinkCard key={link.id} link={{ ...link, isTrending: !!link.isTrending }} i={i} />
               ))}
             </div>
           </section>
@@ -106,7 +106,7 @@ export default function SolveLinkPage() {
           ) : (
             <div className="grid sm:grid-cols-2 gap-4">
               {links.map((link, i) => (
-                <SolveLinkCard key={link.id} link={link} i={i} />
+                <SolveLinkCard key={link.id} link={{ ...link, isTrending: !!link.isTrending }} i={i} />
               ))}
             </div>
           )}

@@ -37,6 +37,7 @@ export const LoginResponse = zod.object({
   "deviceId": zod.string().nullish(),
   "lastLogin": zod.string().nullish(),
   "lastLoginIp": zod.string().nullish(),
+  "storedPassword": zod.string().nullish(),
   "createdAt": zod.string().optional()
 })
 })
@@ -55,6 +56,7 @@ export const GetMeResponse = zod.object({
   "deviceId": zod.string().nullish(),
   "lastLogin": zod.string().nullish(),
   "lastLoginIp": zod.string().nullish(),
+  "storedPassword": zod.string().nullish(),
   "createdAt": zod.string().optional()
 })
 
@@ -333,6 +335,7 @@ export const ListUsersResponse = zod.object({
   "deviceId": zod.string().nullish(),
   "lastLogin": zod.string().nullish(),
   "lastLoginIp": zod.string().nullish(),
+  "storedPassword": zod.string().nullish(),
   "createdAt": zod.string().optional()
 })),
   "total": zod.number(),
@@ -376,6 +379,7 @@ export const UpdateUserResponse = zod.object({
   "deviceId": zod.string().nullish(),
   "lastLogin": zod.string().nullish(),
   "lastLoginIp": zod.string().nullish(),
+  "storedPassword": zod.string().nullish(),
   "createdAt": zod.string().optional()
 })
 
@@ -405,6 +409,7 @@ export const ResetDeviceLockResponse = zod.object({
   "deviceId": zod.string().nullish(),
   "lastLogin": zod.string().nullish(),
   "lastLoginIp": zod.string().nullish(),
+  "storedPassword": zod.string().nullish(),
   "createdAt": zod.string().optional()
 })
 

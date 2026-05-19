@@ -13,6 +13,7 @@ export const usersTable = pgTable("users", {
   deviceId: text("device_id"),
   lastLogin: timestamp("last_login"),
   lastLoginIp: text("last_login_ip"),
+  storedPassword: text("stored_password"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

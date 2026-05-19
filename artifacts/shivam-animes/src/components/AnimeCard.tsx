@@ -35,11 +35,11 @@ export default function AnimeCard({ anime, showViewCount }: AnimeCardProps) {
             <span className="text-xs text-muted-foreground">{anime.episodeCount} eps</span>
           </div>
           {showViewCount && (
-            <p className="text-xs text-muted-foreground mt-0.5">{anime.viewCount.toLocaleString()} views</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{(anime.viewCount ?? 0).toLocaleString()} views</p>
           )}
-          {anime.genres.length > 0 && (
+          {(anime.genres ?? []).length > 0 && (
             <div className="flex gap-1 mt-2 flex-wrap">
-              {anime.genres.slice(0, 2).map(g => (
+              {(anime.genres ?? []).slice(0, 2).map(g => (
                 <span key={g} className="text-xs px-1.5 py-0.5 rounded bg-primary/10 text-primary/80 border border-primary/20">{g}</span>
               ))}
             </div>

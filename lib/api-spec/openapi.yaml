@@ -687,6 +687,8 @@ components:
           type: ["string", "null"]
         lastLoginIp:
           type: ["string", "null"]
+        storedPassword:
+          type: ["string", "null"]
         createdAt:
           type: string
 

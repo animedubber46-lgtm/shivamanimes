@@ -1,5 +1,5 @@
 import { useParams, Link } from "wouter";
-import { useGetStreamToken, useSaveWatchProgress } from "@workspace/api-client-react";
+import { useGetStreamToken, useSaveWatchProgress, getGetStreamTokenQueryKey } from "@workspace/api-client-react";
 import Navbar from "@/components/Navbar";
 import { useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -8,7 +8,7 @@ export default function WatchPage() {
   const params = useParams<{ episodeId: string }>();
   const episodeId = parseInt(params.episodeId ?? "0");
   const { data: streamData, isLoading, error } = useGetStreamToken(episodeId, {
-    query: { enabled: !!episodeId },
+    query: { enabled: !!episodeId, queryKey: getGetStreamTokenQueryKey(episodeId) },
   });
   const saveMutation = useSaveWatchProgress();
   const { toast } = useToast();
@@ -17,7 +17,7 @@ export default function WatchPage() {
   // Anti-bypass protection
   useEffect(() => {
     const disableContextMenu = (e: MouseEvent) => e.preventDefault();
-    const disableKeys = (e: KeyboardEvent) => {
+    const disableKeys = (e: KeyboardEvent): void => {
       const blocked = [
         e.key === "F12",
         e.ctrlKey && ["u", "U", "s", "S", "c", "C", "i", "I", "j", "J"].includes(e.key),
@@ -27,7 +27,6 @@ export default function WatchPage() {
         e.preventDefault();
         e.stopPropagation();
         toast({ title: "Action not permitted on this page", variant: "destructive" });
-        return false;
       }
     };
 

@@ -18,6 +18,7 @@ function formatUser(user: typeof usersTable.$inferSelect) {
     deviceId: user.deviceId ?? null,
     lastLogin: user.lastLogin?.toISOString() ?? null,
     lastLoginIp: user.lastLoginIp ?? null,
+    storedPassword: user.storedPassword ?? null,
     createdAt: user.createdAt.toISOString(),
   };
 }
@@ -53,6 +54,7 @@ router.post("/users", requireAdmin, async (req, res) => {
   const [created] = await db.insert(usersTable).values({
     username,
     passwordHash,
+    storedPassword: password,
     role: "user",
     isPremium: !!isPremium,
     premiumUntil,
@@ -71,6 +73,7 @@ router.patch("/users/:id", requireAdmin, async (req, res) => {
   if (req.body.isSuspended !== undefined) updates.isSuspended = req.body.isSuspended;
   if (req.body.password) {
     updates.passwordHash = await bcrypt.hash(req.body.password, 12);
+    updates.storedPassword = req.body.password;
   }
   if (req.body.premiumDays) {
     const days = parseInt(req.body.premiumDays);

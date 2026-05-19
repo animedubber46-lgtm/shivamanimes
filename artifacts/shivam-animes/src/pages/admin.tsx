@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useListUsers, useUpdateUser, useCreateUser, useCreateAnime, useCreateEpisode, useGetAnalyticsSummary, useGetTopAnime, useListAnime, useDeleteAnime } from "@workspace/api-client-react";
+import { useListUsers, useUpdateUser, useCreateUser, useCreateAnime, useCreateEpisode, useUpdateEpisode, useGetAnalyticsSummary, useGetTopAnime, useListAnime, useDeleteAnime, useGetAnime, getGetAnimeQueryKey } from "@workspace/api-client-react";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 
-type Tab = "users" | "anime" | "analytics" | "add-anime" | "add-episode" | "create-user";
+type Tab = "users" | "anime" | "analytics" | "add-anime" | "add-episode" | "create-user" | "edit-episodes";
 
 function fmt(date: string | null | undefined) {
   if (!date) return "—";
@@ -19,6 +19,7 @@ export default function AdminPage() {
     anime: "Anime",
     "add-anime": "Add Anime",
     "add-episode": "Add Episode",
+    "edit-episodes": "Edit Episodes",
     "create-user": "Create User",
     analytics: "Analytics",
   };
@@ -55,6 +56,7 @@ export default function AdminPage() {
         {tab === "anime" && <AnimeTab />}
         {tab === "add-anime" && <AddAnimeTab />}
         {tab === "add-episode" && <AddEpisodeTab />}
+        {tab === "edit-episodes" && <EditEpisodesTab />}
         {tab === "create-user" && <CreateUserTab />}
         {tab === "analytics" && <AnalyticsTab />}
       </div>
@@ -139,11 +141,27 @@ function UsersTab() {
                 className="overflow-hidden"
               >
                 <div className="px-4 pb-4 border-t border-border/30 bg-card/30 space-y-4 pt-3">
+                  {/* Credentials box — always visible for admin */}
+                  <div className="p-3 rounded-xl bg-primary/5 border border-primary/20">
+                    <p className="text-xs font-bold text-primary uppercase tracking-wider mb-2">Login Credentials</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="bg-background/60 rounded-lg px-3 py-2">
+                        <p className="text-xs text-muted-foreground mb-0.5">Username</p>
+                        <p className="text-sm font-mono font-bold text-foreground select-all">{user.username}</p>
+                      </div>
+                      <div className="bg-background/60 rounded-lg px-3 py-2">
+                        <p className="text-xs text-muted-foreground mb-0.5">Password</p>
+                        <p className="text-sm font-mono font-bold text-foreground select-all">
+                          {(user as unknown as { storedPassword?: string | null }).storedPassword ?? <span className="text-muted-foreground italic font-normal text-xs">Not set via admin</span>}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Detail grid */}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {[
                       { label: "User ID", value: String(user.id) },
-                      { label: "Username", value: user.username },
                       { label: "Role", value: user.role },
                       { label: "Status", value: user.isSuspended ? "Suspended" : "Active" },
                       { label: "Plan", value: user.isPremium ? "Premium" : "Free" },
@@ -517,6 +535,173 @@ function AddEpisodeTab() {
   );
 }
 
+function EditEpisodesTab() {
+  const { data: animeData } = useListAnime({ page: 1, limit: 100 });
+  const animeList = animeData?.anime ?? [];
+  const [selectedAnimeId, setSelectedAnimeId] = useState<number | null>(null);
+  const { data: episodes, refetch: refetchEpisodes } = useGetAnime(selectedAnimeId ?? 0, {
+    query: { enabled: !!selectedAnimeId, queryKey: getGetAnimeQueryKey(selectedAnimeId ?? 0) },
+  });
+  const updateMutation = useUpdateEpisode();
+  const { toast } = useToast();
+  const [editing, setEditing] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState({ number: "", title: "", streamUrl: "", thumbnail: "" });
+
+  const startEdit = (ep: { id: number; number: number; title: string; streamUrl?: string | null; thumbnail?: string | null }) => {
+    setEditing(ep.id);
+    setEditForm({
+      number: String(ep.number),
+      title: ep.title,
+      streamUrl: ep.streamUrl ?? "",
+      thumbnail: ep.thumbnail ?? "",
+    });
+  };
+
+  const saveEdit = async (ep: { id: number; animeId: number }) => {
+    try {
+      await updateMutation.mutateAsync({
+        animeId: ep.animeId,
+        episodeId: ep.id,
+        data: {
+          number: parseInt(editForm.number),
+          title: editForm.title || null,
+          streamUrl: editForm.streamUrl || null,
+          thumbnail: editForm.thumbnail || null,
+        },
+      });
+      setEditing(null);
+      await refetchEpisodes();
+      toast({ title: "Episode updated!" });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Update failed";
+      toast({ title: msg, variant: "destructive" });
+    }
+  };
+
+  const epList = episodes?.episodes ?? [];
+
+  return (
+    <div className="space-y-4 max-w-4xl">
+      <div className="bg-card border border-border/50 rounded-2xl p-4">
+        <h2 className="text-base font-bold text-foreground mb-1">Edit Episode Links & Details</h2>
+        <p className="text-xs text-muted-foreground mb-4">Select an anime to view and edit all its episodes. Fix missing links here.</p>
+
+        <select
+          value={selectedAnimeId ?? ""}
+          onChange={e => { setSelectedAnimeId(e.target.value ? parseInt(e.target.value) : null); setEditing(null); }}
+          className="w-full bg-background/60 border border-border text-foreground rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-primary mb-4"
+        >
+          <option value="">Select an anime...</option>
+          {animeList.map(a => (
+            <option key={a.id} value={a.id}>{a.title} ({a.episodeCount} eps)</option>
+          ))}
+        </select>
+
+        {selectedAnimeId && epList.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-8">No episodes yet. Add episodes from the "Add Episode" tab.</p>
+        )}
+
+        {epList.length > 0 && (
+          <div className="space-y-2">
+            {epList.map((ep, i) => (
+              <motion.div
+                key={ep.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.03 }}
+                className="rounded-xl border border-border/40 overflow-hidden"
+              >
+                {editing === ep.id ? (
+                  /* Edit mode */
+                  <div className="p-4 bg-card/60 space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-1 block">Episode #</label>
+                        <input
+                          type="number"
+                          value={editForm.number}
+                          onChange={e => setEditForm(f => ({ ...f, number: e.target.value }))}
+                          className="w-full bg-background border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-1 block">Title</label>
+                        <input
+                          type="text"
+                          value={editForm.title}
+                          onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))}
+                          className="w-full bg-background border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-1 block">
+                        Stream / Video Link
+                        {editForm.streamUrl && <span className="ml-2 text-green-400 normal-case tracking-normal font-normal">✓ Link set</span>}
+                      </label>
+                      <input
+                        type="url"
+                        value={editForm.streamUrl}
+                        onChange={e => setEditForm(f => ({ ...f, streamUrl: e.target.value }))}
+                        placeholder="https://your-stream-link.com/episode"
+                        className="w-full bg-background border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground font-semibold uppercase tracking-wider mb-1 block">Thumbnail URL (optional)</label>
+                      <input
+                        type="url"
+                        value={editForm.thumbnail}
+                        onChange={e => setEditForm(f => ({ ...f, thumbnail: e.target.value }))}
+                        placeholder="https://image-url.com/thumb.jpg"
+                        className="w-full bg-background border border-border text-foreground rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => saveEdit({ id: ep.id, animeId: ep.animeId })}
+                        disabled={updateMutation.isPending}
+                        className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90 transition-all disabled:opacity-50"
+                      >
+                        {updateMutation.isPending ? "Saving…" : "Save Changes"}
+                      </button>
+                      <button
+                        onClick={() => setEditing(null)}
+                        className="px-4 py-1.5 rounded-lg border border-border text-muted-foreground text-xs hover:text-foreground transition-all"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* View mode */
+                  <div className="flex items-center gap-3 px-4 py-3 hover:bg-card/40 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-black text-primary">{ep.number}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">{ep.title}</p>
+                      <p className={`text-xs mt-0.5 font-mono truncate ${ep.streamUrl ? "text-green-400" : "text-destructive/60"}`}>
+                        {ep.streamUrl ? ep.streamUrl : "⚠ No link — click Edit to add"}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => startEdit(ep)}
+                      className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all font-semibold"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function CreateUserTab() {
   const createMutation = useCreateUser();
   const { toast } = useToast();
@@ -727,7 +912,7 @@ function AnalyticsTab() {
           <h2 className="text-base font-bold text-foreground mb-4">Top Anime by Views</h2>
           <div className="rounded-xl border border-border/50 overflow-hidden">
             {topAnime.map((a, i) => (
-              <div key={a.id} className="flex items-center gap-4 px-4 py-3 border-b border-border/20 hover:bg-card/40 transition-colors">
+              <div key={a.animeId} className="flex items-center gap-4 px-4 py-3 border-b border-border/20 hover:bg-card/40 transition-colors">
                 <span className={`text-lg font-black ${i === 0 ? "text-yellow-400" : i === 1 ? "text-muted-foreground" : i === 2 ? "text-amber-600" : "text-muted-foreground/50"}`}>
                   #{i + 1}
                 </span>

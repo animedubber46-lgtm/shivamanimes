@@ -1,5 +1,5 @@
 import { useParams, Link } from "wouter";
-import { useGetAnime, useAddToWatchlist, useRemoveFromWatchlist, getGetWatchlistQueryKey, type Episode } from "@workspace/api-client-react";
+import { useGetAnime, useAddToWatchlist, useRemoveFromWatchlist, getGetWatchlistQueryKey, getGetAnimeQueryKey, type Episode } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
@@ -9,7 +9,7 @@ import { useState } from "react";
 export default function AnimeDetailPage() {
   const params = useParams<{ id: string }>();
   const id = parseInt(params.id ?? "0");
-  const { data: anime, isLoading } = useGetAnime(id, { query: { enabled: !!id } });
+  const { data: anime, isLoading } = useGetAnime(id, { query: { enabled: !!id, queryKey: getGetAnimeQueryKey(id) } });
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const addMutation = useAddToWatchlist();
@@ -86,7 +86,7 @@ export default function AnimeDetailPage() {
           {/* Info */}
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap gap-2 mb-2">
-              {anime.genres.map(g => (
+              {(anime.genres ?? []).map(g => (
                 <span key={g} className="text-xs px-2 py-0.5 rounded bg-primary/10 border border-primary/20 text-primary">{g}</span>
               ))}
               <span className={`text-xs px-2 py-0.5 rounded font-medium ${anime.status === "ongoing" ? "bg-green-500/10 border border-green-500/20 text-green-400" : "bg-blue-500/10 border border-blue-500/20 text-blue-400"}`}>
@@ -99,7 +99,7 @@ export default function AnimeDetailPage() {
             <div className="flex gap-4 text-sm text-muted-foreground mb-3">
               {anime.releaseYear && <span>{anime.releaseYear}</span>}
               <span>{anime.episodeCount} Episodes</span>
-              <span>{anime.viewCount.toLocaleString()} Views</span>
+              <span>{(anime.viewCount ?? 0).toLocaleString()} Views</span>
             </div>
 
             <p className="text-sm text-muted-foreground mb-4 max-w-2xl leading-relaxed">{anime.description}</p>
